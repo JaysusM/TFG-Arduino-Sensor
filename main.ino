@@ -1,6 +1,7 @@
 #include <SoftwareSerial.h>
 #define BT_SERIAL_RX 15
 #define BT_SERIAL_TX 14
+#define SENSOR_PIN 0
 SoftwareSerial BluetoothSerial(BT_SERIAL_RX, BT_SERIAL_TX);
 
 const int sampleWindow = 50;
@@ -8,6 +9,7 @@ unsigned int sample;
 
 void setup() 
 {
+   pinMode(SENSOR_PIN, INPUT);
    Serial.begin(9600);
    BluetoothSerial.begin(9600);
 }
@@ -23,7 +25,7 @@ void loop()
 
    while (millis() - startMillis < sampleWindow)
    {
-      sample = analogRead(0);
+      sample = analogRead(SENSOR_PIN);
       if (sample < 1024)
       {
          if (sample > signalMax)
@@ -37,8 +39,9 @@ void loop()
       }
    }
    peakToPeak = signalMax - signalMin;
-   double volts = (peakToPeak * 5.0) / 1024;
+   double volts = (peakToPeak * 5 * (5/ 1.5)) / 1024;
 
    BluetoothSerial.println(volts);
-   delay(2000);
+   Serial.println(volts);
+   delay(500);
 }
